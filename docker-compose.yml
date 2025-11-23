@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OPEN_AI_API_KEY=${OPEN_AI_API_KEY}
+      - DATABASE_URL=sqlite:///./data/data.db
+    volumes:
+      # Mount code for development (optional - remove for production)
+      - ./app:/app/app
+      # Persist database
+      - ./data:/app/data
+    restart: unless-stopped
