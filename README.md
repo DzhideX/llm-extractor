@@ -121,3 +121,20 @@ The demo script will:
 - **OpenAI API**: LLM-powered document analysis
 - **SQLite**: Lightweight database
 - **Docker**: Containerization
+
+## Extra
+
+In this section, I go over my design decisions/tradeoffs, what I'd improve over time and any assumptions I made along the way of implementing this project:
+
+### Improve with time:
+- I would figure out a way to minimize the amount of text I need to send for the LLM to parse based on the business use case. Currently, we’re sending the whole text, but we could use a mixture of some heuristics to extract more relevant parts rather than sending all of it.
+- Would take more care in what kind of error messages are being returned (based on whether this is a client facing or internal feature) in the API.
+- Any kind of auth has been disregarded due to time constraints.
+- Add caching on the /extract endpoint via redis for previously extracted documents (we could use hash-based deduplication for this).
+- Add retry logic for transient LLM failures (we could use exponental backoff).
+- Add a proper suite of tests, logging, track metrics. Also, code-wise, I'd add linting and formatting.
+
+
+### Assumptions:
+- The PDFs are legal documents with clauses. It would make sense to maybe have a cheap LLM call to catch whether or not the pdf is that, and then return a response asking a legal document to be sent.
+- Assumed the PDFs wouldn’t be arbitrarily long. In case of pdfs with thousands of pages, we might have to think about more aggressive ways to figure out which parts of text are relevant to send to the LLM (the less we send the better ~ if performance is unchanged). However, even this would eventually not be enough. In that case, we would have to make multiple calls to the LLM rather than one singular file. We might want to cap the size of the PDF being sent as well (this depends on the business use case).
